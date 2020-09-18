@@ -54,7 +54,7 @@ export interface TagInfo {
 export interface TaskPropObject {
   id: number,
   name: string;
-  type: string;
+  kind: string;
   catalog: CatalogInfo;
   latestVersion: LatestVersionInfo,
   tags: Array<TagInfo>,
@@ -118,22 +118,40 @@ const Task: React.FC<TaskProp> = (props: any) => {
   // }
   // for adding icon to task and pipeline
   let resourceIcon: React.ReactNode;
-  if (props.task.type.toLowerCase() === 'task') {
-    resourceIcon = <Tooltip content={<b>Task</b>}>
-      <BuildIcon
-        style={{width: '2em', height: '2em', verticalAlign: '-0.2em'}}
-        color="#484848"
-      />
-    </Tooltip>;
+  if (props.task) {
+    if (props.task.kind.toLowerCase() === 'task') {
+      resourceIcon = <Tooltip content={<b>Task</b>}>
+        <BuildIcon
+          style={{width: '2em', height: '2em', verticalAlign: '-0.2em'}}
+          color="#484848"
+        />
+      </Tooltip>;
+    } else {
+      resourceIcon = <Tooltip content={<b>Pipeline</b>}>
+        <DomainIcon
+          style={{width: '2em', height: '2em', verticalAlign: '-0.2em'}}
+          color="#484848"
+        />
+      </Tooltip>;
+    };
+  }
+  // resource summary
+  let resourceSummary = '';
+  if (props.task.latestVersion.description.length > 120) {
+    resourceSummary = props.task.latestVersion.description.indexOf('\n') > 120 ?
+      props.task.latestVersion.description.substring(0, 120) :
+      props.task.latestVersion.description.substring(0,
+        props.task.latestVersion.description.indexOf('\n') !== -1 ?
+          props.task.latestVersion.description.indexOf('\n') : 120);
+    if (props.task.latestVersion.description.indexOf('\n') > 120 ||
+      props.task.latestVersion.description.indexOf('\n') === -1) {
+      resourceSummary += '...';
+    }
   } else {
-    resourceIcon = <Tooltip content={<b>Pipeline</b>}>
-      <DomainIcon
-        style={{width: '2em', height: '2em', verticalAlign: '-0.2em'}}
-        color="#484848"
-      />
-    </Tooltip>;
-  };
-
+    resourceSummary = props.task.latestVersion.description.indexOf('\n') !== -1 ?
+      props.task.latestVersion.description.substring(0, props.task.latestVersion.description.indexOf('\n')) :
+      props.task.latestVersion.description;
+  }
 
   // Display name
 
@@ -192,9 +210,7 @@ const Task: React.FC<TaskProp> = (props: any) => {
           <CardBody className="catalog-tile-pf-body">
             <div className="catalog-tile-pf-description">
               <span>
-                {`${props.task.latestVersion.description.substring(0,
-                  props.task.latestVersion.description.indexOf('\n'))}` ||
-                  `${props.task.latestVersion.description}`}
+                {resourceSummary}
               </span>
             </div>
 

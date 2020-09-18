@@ -7,14 +7,18 @@ import {fetchTaskSuccess} from '../redux/Actions/TaskAction';
 import Loader from '../loader/loader';
 import './basicdetail.css';
 import {API_URL} from '../../constants';
-
+interface ParamTypes {
+  taskId: string;
+}
 
 const Detail: React.FC = (props: any) => {
-  const [allversion, setAllversion] = React.useState();
-  const {taskId} = useParams();
+  console.log('0000', props);
+
+  const [allversion, setAllversion] = React.useState([]);
+  const {taskId} = useParams<ParamTypes>();
   React.useEffect(() => {
     props.fetchTaskSuccess();
-    fetch(`${ API_URL }/resource/${ taskId }/versions`)
+    fetch(`${API_URL}/resource/${taskId}/versions`)
       .then((response) => response.json())
       .then((data) => setAllversion(data.versions));
     // eslint-disable-next-line
@@ -25,9 +29,15 @@ const Detail: React.FC = (props: any) => {
     // let temp string;
     for (let i = 0; i < props.TaskData.length; i++) {
       if (props.TaskData[i].id === Number(taskId)) {
+        const x = [{
+          'id': 4,
+          'version': '0.1',
+          'rawURL': 'https://raw.githubusercontent.com/tektoncd/catalog/master/task/aws-cli/0.1/aws-cli.yaml',
+          'webURL': 'https://github.com/tektoncd/catalog/tree/master/task/aws-cli/0.1/aws-cli.yaml',
+        }];
         return (
           < BasicDetail task={props.TaskData[i]}
-            version={allversion}
+            version={x}
           />
         );
       }
